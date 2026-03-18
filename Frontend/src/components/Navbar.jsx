@@ -37,11 +37,11 @@ const Navbar = () => {
       className='md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer'/>
 
         {/* //! Mobile menu auto-closes on navigation & scroll to top on route change */}
-       <Link onClick={()=>{scrollTo(0,0),setIsOpen(false)}} to='/'>Home</Link>
-       <Link onClick={()=>{scrollTo(0,0),setIsOpen(false)}} to='/movies'>Movies</Link>
-       <Link onClick={()=>{scrollTo(0,0),setIsOpen(false)}} to='/'>Theaters</Link>
-       <Link onClick={()=>{scrollTo(0,0),setIsOpen(false)}} to='/'>Releases</Link>
-       <Link onClick={()=>{scrollTo(0,0),setIsOpen(false)}} to='/favorite'>Favorite</Link>
+       <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} to='/'>Home</Link>
+       <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} to='/movies'>Movies</Link>
+       <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} to='/'>Theaters</Link>
+       <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} to='/'>Releases</Link>
+       <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} to='/favorite'>Favorite</Link>
      </div>
 
      {/* //todo userlogin button and search icon */}
