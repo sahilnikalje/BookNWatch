@@ -6,7 +6,7 @@ const Footer = () => {
              <footer className="px-6 mt-40 md:px-16 lg:px-36 w-full text-gray-300">
             <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500 pb-14">
                 <div className="md:max-w-96">
-                    <img alt="" class="h-11" src={assets.BookNWatch} />
+                    <img alt="" className="h-11" src={assets.BookNWatch} />
                     <p className="mt-6 text-sm">
                        BookNWatch makes movie ticket booking quick and easy. Discover the latest movies, check showtimes, and reserve your seats instantly for an amazing cinema experience.                    </p>
                     <div className="flex items-center gap-2 mt-4">
