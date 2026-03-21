@@ -12,6 +12,11 @@ import MovieDetails from './pages/MovieDetails';
 import SeatLayout from './pages/SeatLayout';
 import MyBookings from './pages/MyBookings';
 import Favorite from './pages/Favorite';
+import Layout from './pages/admin/Layout';
+import Dashboard from './pages/admin/Dashboard';
+import AddShows from './pages/admin/AddShows';
+import ListShows from './pages/admin/ListShows';
+import ListBookings from './pages/admin/ListBookings';
 
 function App() {
   //! id the url starts with admin, means we are on the admin page, so we dont need to show navbar on admin page
@@ -31,6 +36,14 @@ function App() {
           <Route path='/movies/:id/:date' element={<SeatLayout/>}/>
           <Route path='/my-bookings' element={<MyBookings/>}/>
           <Route path='/favorite' element={<Favorite/>}/>
+
+       {/* //! admin routes */}
+          <Route path='/admin/*' element={<Layout/>}>
+             <Route index element={<Dashboard/>}/>
+             <Route path='add-shows' element={<AddShows/>}/>
+             <Route path='list-shows' element={<ListShows/>}/>
+             <Route path='list-bookings' element={<ListBookings/>}/>
+          </Route>
       </Routes>
 
        {/*//! same as navbar, when we are not on admin panel then only display footer */}
