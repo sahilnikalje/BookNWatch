@@ -15,13 +15,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
+// Handle favicon requests
 app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
 
 app.use(clerkMiddleware());
 
-// Ensure DB is available before handling API requests.
+// Ensure DB is available before handling API requests
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -38,10 +39,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({
@@ -50,10 +53,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Only listen when not on Vercel
 if (process.env.VERCEL !== "1") {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
 
+// Export for Vercel
 module.exports = app;
