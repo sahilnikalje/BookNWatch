@@ -4,8 +4,13 @@ const cors = require("cors");
 const { clerkMiddleware } = require("@clerk/express");
 const { serve } = require("inngest/express");
 
-const { inngest, functions } = require("./inngest");
 const connectDB = require("./configs/db");
+const { inngest, functions } = require("./inngest");
+
+const showRouter = require("./routes/showRoutes");
+const bookingRouter = require("./routes/bookingRoutes");
+const adminRouter = require("./routes/adminRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 
@@ -14,23 +19,7 @@ const PORT = process.env.PORT || 3000;
 //** middlewares */
 app.use(express.json());
 app.use(cors());
-
-// Handle favicon requests
-app.get("/favicon.ico", (req, res) => {
-  res.status(204).end();
-});
-
 app.use(clerkMiddleware());
-
-// Ensure DB is available before handling API requests
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
 
 //**routes */
 app.get("/", (req, res) => {
@@ -38,27 +27,21 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use('/api/show', showRouter)
+app.use('/api/booking', bookingRouter)
+app.use('/api/admin', adminRouter)
+app.use('/api/user', userRouter)
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.log(err.message);
+    process.exit(1);
+  }
+};
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({
-    message: "Internal server error",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
-
-// Only listen when not on Vercel
-if (process.env.VERCEL !== "1") {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
-
-// Export for Vercel
-module.exports = app;
+startServer();
