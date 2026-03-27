@@ -63,11 +63,10 @@ const AddShows = () => {
 
   const handleSubmit=async()=>{
     try{
-      setAddingShow(true)
-
       if(!selectedMovie || Object.keys(dateTimeSelection).length===0 || !showPrice){
-        return toast('Required detailes missing')
+        return toast.error('Required details missing')
       }
+      setAddingShow(true)
       const showsInput=Object.entries(dateTimeSelection).map(([date, time])=>(
         {date, time}
       ))
@@ -118,7 +117,7 @@ const AddShows = () => {
         <div className='group flex flex-wrap gap-4 mt-4 w-max'>
           {nowPlayingMovies.map((movie)=>(
 
-             <div key={movie._id} onClick={()=>setSelectedMovie(movie.id)}
+             <div key={movie.id} onClick={()=>setSelectedMovie(movie.id)}
                className={`relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40
                               hover:-translate-y-1 transition duration-300`}>
                <div className='relative rounded-lg overflow-hidden'>

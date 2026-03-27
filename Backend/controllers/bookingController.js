@@ -91,7 +91,11 @@ const getOccupiedSeats=async(req,res)=>{
         const {showId}=req.params
         const showData=await Show.findById(showId)
 
-        const occupiedSeats=Object.keys(showData.occupiedSeats)
+        if(!showData){
+            return res.status(404).json({success:false, message:"Show not found"})
+        }
+
+        const occupiedSeats=Object.keys(showData.occupiedSeats || {})
 
         res.status(200).json({success:true, occupiedSeats})
     }

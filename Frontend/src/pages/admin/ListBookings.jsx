@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { dummyBookingData } from '../../assets/assets'
 import Loading from '../../components/Loading'
 import Title from '../../components/admin/Title'
 import { dateFormat } from '../../lib/dateFormat'
@@ -31,9 +30,7 @@ const ListBookings = () => {
      if(user){
        getAllBookings()
      }
-  },[])
-
-  return !isLoading ?(
+  },[user])
     <>
       <Title text1='List' text2='Bookings'/> 
 

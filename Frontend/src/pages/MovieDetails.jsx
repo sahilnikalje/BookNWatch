@@ -89,9 +89,10 @@ const MovieDetails = () => {
                    href='#dateSelect'>
                     Buy Tickets
                   </a>
-                 <button className='bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95'>
+                 <button onClick={handleFavorite} aria-label="Toggle favorite" aria-pressed={!!favoriteMovies.find(movie=>movie._id===id)}
+                   className='bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95'>
 
-                    <Heart onClick={handleFavorite} 
+                    <Heart 
                       className={`w-5 h-5 ${favoriteMovies.find(movie=>movie._id===id) ? 
                        'fill-primary text-primary' : ''}`}/>
                  </button>

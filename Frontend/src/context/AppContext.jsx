@@ -88,12 +88,15 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     fetchShows();
   }, []);
-  // useEffect(()=>{
-  //     if(user){
-  //         fetchIsAdmin()
-  //         fetchFavoriteMovies()
-  //     }
-  // },[user])
+
+  useEffect(() => {
+    if (user) {
+      fetchFavoriteMovies();
+    } else {
+      setFavoriteMovies([]);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (user && location.pathname.startsWith("/admin")) {
       setIsAdminLoading(true);
@@ -101,7 +104,6 @@ export const AppProvider = ({ children }) => {
         const token = await getToken();
         if (token) {
           fetchIsAdmin();
-          fetchFavoriteMovies();
         } else {
           setIsAdmin(false);
           setIsAdminLoading(false);

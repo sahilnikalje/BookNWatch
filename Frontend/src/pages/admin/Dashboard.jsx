@@ -38,16 +38,17 @@ const Dashboard = () => {
 
       if(data.success){
         setDashboardData(data.dashboardData)
-        setLoading(false)
       }
       else{
         toast.error(data.message)
       }
      }
      catch(err){
-       toast.error('Error fetching dashboard data: ', err)
+       toast.error(`Error fetching dashboard data: ${err?.message || 'Unknown error'}`)
      }
-     setLoading(false)
+     finally{
+       setLoading(false)
+     }
   }
 
   useEffect(()=>{

@@ -56,9 +56,8 @@ const SeatLayout = () => {
              return(
                <button onClick={()=>handleSeatClick(seatId)}
                     key={seatId}
-                  className={`h-8 w-8 rounded border border-primary/60 cursor-pointer 
-                       ${selectedSeats.includes(seatId) && "bg-primary text-white"}
-                       ${occupiedSeats.includes(seatId) && "opacity-50"}`}
+                    disabled={occupiedSeats.includes(seatId)}
+                  className={`h-8 w-8 rounded border border-primary/60 ${occupiedSeats.includes(seatId) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}
                >
                  {seatId}
                </button>
@@ -112,7 +111,7 @@ const SeatLayout = () => {
 
   useEffect(()=>{
     getShow()
-  },[])
+  },[id])
 
   useEffect(()=>{
     if(selectedTime){
