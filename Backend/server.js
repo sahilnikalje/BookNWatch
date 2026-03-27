@@ -7,6 +7,8 @@ const { serve } = require("inngest/express");
 const connectDB = require("./configs/db");
 const { inngest, functions } = require("./inngest");
 
+const stripeWebhooks=require('./controllers/stripeWebhooks')
+
 const showRouter = require("./routes/showRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
 const adminRouter = require("./routes/adminRoutes");
@@ -15,6 +17,9 @@ const userRouter = require("./routes/userRoutes");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
+//**Stripe webhooks route */
+app.use('/api/stripe', express.raw({type:'application/json'}), stripeWebhooks)
 
 //** middlewares */
 app.use(express.json());
