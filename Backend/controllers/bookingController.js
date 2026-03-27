@@ -1,6 +1,8 @@
 const Show=require('../models/showModel')
 const Booking=require('../models/bookingSchema')
 
+const stripe=require('stripe')
+
 const checkSeatsAvailability=async(showId, selectedSeats)=>{
     try{
       const showData=await Show.findById(showId)
@@ -48,9 +50,35 @@ const createBooking=async(req, res)=>{
         await showData.save()
 
         //todo payment gateway
+        const stripeInstance=new stripe(process.env.STRIPE_SECRET_KEY)
 
+        //todo create line items for stripe
+        const line_items=[{
+            price_data:{
+                currency:'inr',
+                product_data:{
+                    name:showData.movie.title
+                },
+                unit_amount: Math.floor(booking.amount) * 100
+            },
+            quantity:1
+        }]
 
-        res.status(201).json({success:true, message:"Booked Successfully"})
+        const session=await stripeInstance.checkout.sessions.create({
+            success_url:`${origin}/loading/my-bookings`,
+            cancel_url:`${origin}/my-bookings`,
+            line_items:line_items,
+            mode:'payment',
+            metadata:{
+                bookingId:booking._id.toString()
+            },
+            expires_at:Math.floor(Date.now()/1000)+30*60 //! expires in 30 min
+        })
+
+        booking.paymentLink=session.url
+        await booking.save()
+
+        res.status(201).json({success:true, url:session.url})
     }
     catch(err){
         console.log("createBookingErr: ", err.message)
