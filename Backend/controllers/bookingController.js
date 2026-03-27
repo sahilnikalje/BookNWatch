@@ -58,10 +58,10 @@ const createBooking=async(req, res)=>{
     }
 }
 
-const getOccupiedSeats=async()=>{
+const getOccupiedSeats=async(req,res)=>{
     try{
-        const {showId}=rew.params
-        const{showData}=await Show.findById(showId)
+        const {showId}=req.params
+        const showData=await Show.findById(showId)
 
         const occupiedSeats=Object.keys(showData.occupiedSeats)
 
