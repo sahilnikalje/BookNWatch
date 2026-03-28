@@ -4,12 +4,12 @@ const Booking=require('../models/bookingSchema')
 
 const stripeWebhooks=async(req,res)=>{
     const stripeInstance=new stripe(process.env.STRIPE_SECRET_KEY)
-    const sig=request.headers['stripe-signature']
+    const sig=req.headers['stripe-signature']
 
     let event
 
     try{
-        event=stripeInstance.webhooks.constructEvent(request.body, sig, process.env.STRIPE_WEBHOOK_SECRET)
+        event=stripeInstance.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET)
     }
     catch(err){
         console.log("stripeWebhooksErr: ", err.message)
@@ -35,11 +35,11 @@ const stripeWebhooks=async(req,res)=>{
             default:
                 console.log('Unhandled event type: ', event.type)
         }
-        response.json({received:true})
+        res.json({received:true})
     }
     catch(err){
         console.log('Webhook processing error: ', err)
-        response.status(500).send("Internal Server Error")
+        res.status(500).send("Internal Server Error")
     }
 }
 

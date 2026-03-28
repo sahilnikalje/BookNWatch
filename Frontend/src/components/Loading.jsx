@@ -1,17 +1,34 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAppContext } from '../context/AppContext'
 
 const Loading = () => {
   const{nextUrl}=useParams()
   const navigate=useNavigate()
+  const {axios, getToken}=useAppContext()
   
    useEffect(()=>{
-    if(nextUrl){
-      setTimeout(()=>{
-         navigate('/'+nextUrl)
-      },8000)
+    const verifyAndRedirect=async()=>{
+      if(nextUrl){
+        try{
+          // Verify payment status before redirecting
+          await axios.get('/api/booking/verify-payment', {
+            headers:{
+              Authorization: `Bearer ${await getToken()}`
+            }
+          })
+        }
+        catch(err){
+          console.log("Payment verification error:", err)
+        }
+        // Navigate after verification (or if it fails, still redirect)
+        navigate('/'+nextUrl)
+      }
     }
+
+    //Give Stripe webhook a moment to process, then verify
+    setTimeout(verifyAndRedirect, 3000)
   },[])
 
   return (

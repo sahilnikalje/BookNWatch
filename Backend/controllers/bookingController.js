@@ -2,6 +2,7 @@ const Show=require('../models/showModel')
 const Booking=require('../models/bookingSchema')
 
 const stripe=require('stripe')
+const { inngest } = require('../inngest/index')
 
 const checkSeatsAvailability=async(showId, selectedSeats)=>{
     try{
@@ -78,6 +79,15 @@ const createBooking=async(req, res)=>{
         booking.paymentLink=session.url
         await booking.save()
 
+        //todo run inngese scheduler function to check payment status after 10 min
+        await inngest.send({
+            name:'app/checkpayment',
+            data:{
+                bookingId:booking._id.toString()
+            }
+        })
+
+
         res.status(201).json({success:true, url:session.url})
     }
     catch(err){
@@ -105,6 +115,54 @@ const getOccupiedSeats=async(req,res)=>{
     }
 }
 
+const verifyPayment=async(req, res)=>{
+    try{
+        const {userId}=req.auth()
+        const stripeInstance=new stripe(process.env.STRIPE_SECRET_KEY)
 
+        // Find all unpaid bookings for this user that have a payment link
+        const unpaidBookings=await Booking.find({
+            user:userId, 
+            isPaid:false, 
+            paymentLink:{$exists:true, $ne:''}
+        })
 
-module.exports={checkSeatsAvailability, createBooking, getOccupiedSeats}
+        let updatedCount=0
+
+        for(const booking of unpaidBookings){
+            try{
+                // List checkout sessions and find the one matching this booking
+                const sessions=await stripeInstance.checkout.sessions.list({
+                    limit:100
+                })
+
+                const matchingSession=sessions.data.find(
+                    session=>session.metadata?.bookingId===booking._id.toString()
+                )
+
+                if(matchingSession && matchingSession.payment_status==='paid'){
+                    booking.isPaid=true
+                    booking.paymentLink=''
+                    await booking.save()
+                    updatedCount++
+                }
+                // If session expired, clean up the booking's payment link
+                else if(matchingSession && matchingSession.status==='expired'){
+                    booking.paymentLink=''
+                    await booking.save()
+                }
+            }
+            catch(sessionErr){
+                console.log(`Error checking session for booking ${booking._id}: `, sessionErr.message)
+            }
+        }
+
+        res.status(200).json({success:true, message:`Verified ${updatedCount} payment(s)`, updatedCount})
+    }
+    catch(err){
+        console.log("verifyPaymentErr: ", err.message)
+        res.status(500).json({success:false, message:"Something went wrong"})
+    }
+}
+
+module.exports={checkSeatsAvailability, createBooking, getOccupiedSeats, verifyPayment}

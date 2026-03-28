@@ -1,5 +1,7 @@
 const { Inngest } = require("inngest");
 const User = require("../models/userModel");
+const Booking=require('../models/bookingSchema')
+const Show=require('../models/showModel')
 
 const inngest = new Inngest({ id: "movie-ticket-booking" });
 
@@ -54,7 +56,34 @@ const syncUserUpdation = inngest.createFunction(
   },
 );
 
+//todo inngest function to cancel booing & release the seat after 10 minutes when user cancels the booking
+const releaseSeatAndDeleteBooking=inngest.createFunction(
+   {id:'release-seats-delete-booking', triggers:[{event:'app/checkpayment'}]},
+   async({event, step})=>{
+     const tenMinutesLater=new Date(Date.now()+10*60*1000) 
+     await step.sleepUntil('wait-for-10-minutes', tenMinutesLater)
+
+     await step.run('check-payment-status', async()=>{
+       const bookingId=event.data.bookingId
+       const booking=await Booking.findById(bookingId)
+
+       //! if payment is not made then release the seat and delete booking
+       if(!booking.isPaid){
+         const show=await Show.findById(booking.show)
+         booking.bookedSeats.forEach((seat)=>{
+           delete show.occupiedSeats[seat]
+         })
+         show.markModified('occupiedSeats')
+         await show.save()
+         await Booking.findByIdAndDelete(booking._id)
+       }
+     })
+   }
+)
+
+
+
 //todo pass function here
-const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation];
+const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation, releaseSeatAndDeleteBooking];
 
 module.exports = { inngest, functions };
