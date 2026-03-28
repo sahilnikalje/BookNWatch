@@ -1,6 +1,7 @@
 const { default: axios } = require("axios");
 const Movie = require("../models/movieModel");
 const Show = require("../models/showModel");
+const { inngest } = require("../inngest/index");
 
 //todo api to get now playing movies from tmdb
 const getNowPlayingMovies = async (req, res) => {
@@ -87,6 +88,13 @@ const addShow = async (req, res) => {
     if (showsToCreate.length > 0) {
       await Show.insertMany(showsToCreate);
     }
+
+    //todo trigger inngest event
+    await inngest.send({
+       name:'app/shoe.added',
+       data:{movieTitle:movie.title}
+    })
+
     res.status(200).json({ success: true, message: "Show added successfully" });
   } catch (err) {
     console.log("addShowErr: ", err.message);
