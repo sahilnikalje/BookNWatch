@@ -91,7 +91,7 @@ const addShow = async (req, res) => {
 
     //todo trigger inngest event
     await inngest.send({
-       name:'app/shoe.added',
+       name:'app/show.added',
        data:{movieTitle:movie.title}
     })
 
