@@ -6,11 +6,19 @@ const { inngest } = require("../inngest/index");
 //todo api to get now playing movies from tmdb
 const getNowPlayingMovies = async (req, res) => {
   try {
+    const currentYear = new Date().getFullYear();
     const { data } = await axios.get(
-      "https://api.themoviedb.org/3/movie/now_playing",
+      "https://api.themoviedb.org/3/discover/movie",
       {
         headers: {
           Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+        },
+        params: {
+          region: "IN",
+          with_original_language: "hi|mr",
+          sort_by: "popularity.desc",
+          primary_release_year: currentYear,
+          page: 1,
         },
       },
     );
