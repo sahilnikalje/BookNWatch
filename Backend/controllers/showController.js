@@ -89,9 +89,9 @@ const addShow = async (req, res) => {
 
     //todo trigger inngest event
     await inngest.send({
-       name:'app/show.added',
-       data:{movieTitle:movie.title}
-    })
+      name: "app/show.added",
+      data: { movieTitle: movie.title },
+    });
 
     res.status(200).json({ success: true, message: "Show added successfully" });
   } catch (err) {
@@ -111,6 +111,7 @@ const getShows = async (req, res) => {
     const seen = new Set();
     const uniqueShows = shows
       .map((show) => show.movie)
+      .filter((movie) => movie)
       .filter((movie) => {
         const id = movie._id.toString();
         if (seen.has(id)) return false;
@@ -125,7 +126,6 @@ const getShows = async (req, res) => {
   }
 };
 
-
 const getShow = async (req, res) => {
   try {
     const { movieId } = req.params;
@@ -138,7 +138,7 @@ const getShow = async (req, res) => {
     if (movie && (!movie.casts || movie.casts.length === 0)) {
       const creditsRes = await axios.get(
         `https://api.themoviedb.org/3/movie/${movieId}/credits`,
-        { headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` } }
+        { headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` } },
       );
       movie.casts = (creditsRes.data.cast || [])
         .filter((c) => c.profile_path)
