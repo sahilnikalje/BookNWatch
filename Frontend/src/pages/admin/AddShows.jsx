@@ -63,13 +63,39 @@ const AddShows = () => {
 
   const handleSubmit=async()=>{
     try{
-      if(!selectedMovie || Object.keys(dateTimeSelection).length===0 || !showPrice){
-        return toast.error('Required details missing')
+      // Auto-add a pending datetime if user forgot to click "Add Time"
+      let finalDateTimeSelection = dateTimeSelection
+      if(dateTimeInput){
+        const[date, time]=dateTimeInput.split("T")
+        if(date && time){
+          finalDateTimeSelection = {...dateTimeSelection}
+          const times = finalDateTimeSelection[date] || []
+          if(!times.includes(time)){
+            finalDateTimeSelection[date] = [...times, time]
+            setDateTimeSelection(finalDateTimeSelection)
+          }
+        }
+      }
+
+      if(!selectedMovie){
+        return toast.error('Please select a movie')
+      }
+      if(Object.keys(finalDateTimeSelection).length===0){
+        return toast.error('Please add at least one date & time')
+      }
+      if(!showPrice || Number(showPrice) <= 0){
+        return toast.error('Please enter a valid show price')
       }
       setAddingShow(true)
-      const showsInput=Object.entries(dateTimeSelection).map(([date, time])=>(
-        {date, time}
-      ))
+      // Convert each date+time to a proper UTC ISO string using the browser's local timezone
+      const showsInput = Object.entries(finalDateTimeSelection).map(([date, times]) => ({
+        date,
+        time: times.map((time) => {
+          // "2026-04-01T15:00" → parsed as local time by the browser → .toISOString() gives UTC
+          const localDate = new Date(`${date}T${time}`)
+          return localDate.toISOString()
+        })
+      }))
 
       const payload={
         movieId:selectedMovie,

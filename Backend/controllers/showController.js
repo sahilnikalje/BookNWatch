@@ -73,12 +73,10 @@ const addShow = async (req, res) => {
 
     const showsToCreate = [];
     showsInput.forEach((show) => {
-      const showDate = show.date;
-      show.time.forEach((time) => {
-        const dateTimeString = `${showDate}T${time}`;
+      show.time.forEach((isoString) => {
         showsToCreate.push({
           movie: movieId,
-          showDateTime: new Date(dateTimeString),
+          showDateTime: new Date(isoString), // Full ISO string from frontend (timezone-aware)
           showPrice,
           occupiedSeats: {},
         });
